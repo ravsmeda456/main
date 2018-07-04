@@ -1,4 +1,4 @@
-package test;
+package com.edyst.automation;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -13,43 +13,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class edt {
-	public static String getFileName() {
-		    String[] array = new String[]{ "HH","mm","ss","dd","MM","yyyy" };
-		    String file ="";
-		    for (int i = 0; i < array.length; i++) {
-			    Date date = new Date();  
-			    SimpleDateFormat formatter = new SimpleDateFormat(array[i]);  
-			    String strDate = formatter.format(date);  
-			     file= file+strDate;
-			     if(array[i]!="yyyy") {
-			    	 file=file+"_";
-			     }else {
-			    	 file=file+"Test_Log.csv";
-			     }
-		  
-		    }
-		    return file;
-		    
-		}
-	public static void main(String[] args) throws InterruptedException {
-		String Origin,Destination, Log;
-		System.setProperty("webdriver.chrome.driver","/home/ravali/Downloads/chromedriver");
-		
-		WebDriver driver = new ChromeDriver();
-		
-		driver.get("https://edyst-staging-platform.netlify.com/");
-		String Parent = driver.getWindowHandle();
-		Origin=driver.getCurrentUrl();
-		
-		driver.findElement(By.xpath("/html/body/div[1]/div/div[3]/div/div[1]/div[1]/div[1]/div/div[3]/button")).click();
-		
+import com.edyst.utils.CSVUtils;
+
+public class test {
+	public static void signIn(WebDriver driver,String Parent, String Origin) throws InterruptedException{
+		String Destination, Log;
 		WebElement ele=driver.findElement(By.xpath(
-		 "/html/body/div[1]/div/div[3]/div/div[3]/div/div[2]/div/div[5]/div[2]/div/div[1]/div/div[1]/div/span[2]"));
-		
+				 "/html/body/div[1]/div/div[3]/div/div[3]/div/div[2]/div/div[5]/div[2]/div/div[1]/div/div[1]/div/span[2]"));
+				
 		ele.click();
-		Set<String> s=driver.getWindowHandles();
-		System.out.println(s);
+		//System.out.println(s);
 		
 		for (String windowHandle : driver.getWindowHandles())  
 	     {
@@ -61,24 +34,23 @@ public class edt {
 					
 					Log=err.getText();
 					driver.close();
-					//driver.switchTo().window(Parent);
-					BufferedWriter br = new BufferedWriter(new FileWriter("/home/ravali/Desktop/"+getFileName()));
+					BufferedWriter br = new BufferedWriter(new FileWriter("/home/ravali/Desktop/"+CSVUtils.getFileName()));
 					StringBuilder sb = new StringBuilder();
 					  
-						sb.append("Test Name"+"\t"+"Origin" + "\t"+ "Destination"+"\t"+ "Log"+"\t"+ "Status");    
+						sb.append("Test Name"+","+"Origin"+","+ "Destination"+","+ "Log"+","+ "Status");    
 						sb.append("\n");
-						sb.append("Login Test"+"\t"+Origin + "\t"+ Destination+"\t"+ Log+"\t"+ "Error");
+						sb.append("Login Test"+","+Origin + ","+ Destination+","+ Log+","+ "Error");
 					  
 					br.write(sb.toString());
 					br.close();
 					  
 				    Thread.sleep(1000 *5);
-					//driver.quit();
+					
 				    
 			    }
 				catch(Exception e){
 					driver.findElement(By.id("email")).sendKeys("ravsmeda456@gmail.com");
-			        driver.findElement(By.id("pass")).sendKeys("ravali@21");
+			        driver.findElement(By.id("pass")).sendKeys("***");
 			        driver.findElement(By.id("loginbutton")).submit();
 			        System.out.println("Successfully logged in");
 			        
@@ -97,6 +69,25 @@ public class edt {
 			 }	
 			
 	     }
+		
+	}
+	public static void write() {
+		
+	}
+	public static void main(String[] args) throws InterruptedException {
+		final String SERVER_URL = "https://edyst-staging-platform.netlify.com/";
+		String Origin;
+		System.setProperty("webdriver.chrome.driver","/home/ravali/Downloads/chromedriver");
+		
+		WebDriver driver = new ChromeDriver();	
+		driver.get(SERVER_URL);
+		String Parent = driver.getWindowHandle();
+		Origin=driver.getCurrentUrl();
+		
+		driver.findElement(By.xpath("/html/body/div[1]/div/div[3]/div/div[1]/div[1]/div[1]/div/div[3]/button")).click();
+		signIn(driver,Parent,Origin);
+		
+		
 		driver.switchTo().window(Parent);
 		driver.close();
 		
