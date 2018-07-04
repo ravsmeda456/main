@@ -1,12 +1,37 @@
 package test;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Set;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class test {
+public class edt {
+	public static String getFileName() {
+		    String[] array = new String[]{ "HH","mm","ss","dd","MM","yyyy" };
+		    String file ="";
+		    for (int i = 0; i < array.length; i++) {
+			    Date date = new Date();  
+			    SimpleDateFormat formatter = new SimpleDateFormat(array[i]);  
+			    String strDate = formatter.format(date);  
+			     file= file+strDate;
+			     if(array[i]!="yyyy") {
+			    	 file=file+"_";
+			     }else {
+			    	 file=file+"Test_Log.csv";
+			     }
+		  
+		    }
+		    return file;
+		    
+		}
 	public static void main(String[] args) throws InterruptedException {
 		String Origin,Destination, Log;
 		System.setProperty("webdriver.chrome.driver","/home/ravali/Downloads/chromedriver");
@@ -23,21 +48,31 @@ public class test {
 		 "/html/body/div[1]/div/div[3]/div/div[3]/div/div[2]/div/div[5]/div[2]/div/div[1]/div/div[1]/div/span[2]"));
 		
 		ele.click();
+		Set<String> s=driver.getWindowHandles();
+		System.out.println(s);
 		
-		for (String Child : driver.getWindowHandles())  
+		for (String windowHandle : driver.getWindowHandles())  
 	     {
+			 if(!windowHandle.equals(Parent)) {
 				try {
-					driver.switchTo().window(Child);
+					driver.switchTo().window(windowHandle);
 					Destination= driver.getCurrentUrl();
 					WebElement err=driver.findElement(By.xpath("/html/body/div/div/div/div"));
-					Log=err.getText();
 					
-				    PrintWriter writer = new PrintWriter("/home/ravali/Downloads/error.txt", "UTF-8");
-				    
-				    writer.println("Origin Url : " +Origin+"\nDestination Url: "+ Destination+"\n Log: "+ Log);
-				    
-				    writer.close();
-				    //Thread.sleep(1000 *5);
+					Log=err.getText();
+					driver.close();
+					//driver.switchTo().window(Parent);
+					BufferedWriter br = new BufferedWriter(new FileWriter("/home/ravali/Desktop/"+getFileName()));
+					StringBuilder sb = new StringBuilder();
+					  
+						sb.append("Test Name"+"\t"+"Origin" + "\t"+ "Destination"+"\t"+ "Log"+"\t"+ "Status");    
+						sb.append("\n");
+						sb.append("Login Test"+"\t"+Origin + "\t"+ Destination+"\t"+ Log+"\t"+ "Error");
+					  
+					br.write(sb.toString());
+					br.close();
+					  
+				    Thread.sleep(1000 *5);
 					//driver.quit();
 				    
 			    }
@@ -59,11 +94,12 @@ public class test {
 					//driver.navigate().back();
 					
 			    }	
-				
+			 }	
 			
 	     }
-		//driver.switchTo().window(Parent); 
+		driver.switchTo().window(Parent);
+		driver.close();
 		
 	}
-
+ 
 }
