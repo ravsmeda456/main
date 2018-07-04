@@ -6,7 +6,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class edt {
+public class test {
 	public static void main(String[] args) throws InterruptedException {
 		String Origin,Destination, Log;
 		System.setProperty("webdriver.chrome.driver","/home/ravali/Downloads/chromedriver");
